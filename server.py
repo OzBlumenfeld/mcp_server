@@ -115,4 +115,8 @@ mcp.tool(get_weekly_summary)
 
 
 if __name__ == "__main__":
-    mcp.run(transport="sse", port=9005)
+    transport = os.getenv("MCP_TRANSPORT", "sse")
+    if transport == "stdio":
+        mcp.run(transport="stdio")
+    else:
+        mcp.run(transport="sse", port=9005)
