@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "MyAssistant": {
+      "command": "uv",
+      "args": [
+        "run",
+        "python",
+        "server.py"
+      ],
+      "env": {
+        "MCP_TRANSPORT": "stdio"
+      }
+    }
+  }
+}
