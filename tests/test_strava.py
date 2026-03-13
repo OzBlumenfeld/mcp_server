@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from tools.strava import _meters_to_km, _seconds_to_hms, get_recent_activities
+from tools.strava import _meters_to_km, _seconds_to_hms, get_recent_activities, get_weekly_summary
 
 
 def test_meters_to_km() -> None:
@@ -50,3 +50,50 @@ def test_get_access_token_raises_without_env() -> None:
     with patch.dict("os.environ", {}, clear=True):
         with pytest.raises(ValueError, match="Missing Strava credentials"):
             _get_access_token()
+
+
+@patch("tools.strava._get_access_token", return_value="fake_token")
+@patch("tools.strava.httpx.Client")
+def test_get_weekly_summary(mock_client_cls: MagicMock, _mock_token: MagicMock) -> None:
+    mock_resp = MagicMock()
+    mock_resp.json.return_value = [
+        {
+            "name": "Morning Run",
+            "type": "Run",
+            "distance": 10000,
+            "moving_time": 3600,
+            "total_elevation_gain": 50,
+        },
+        {
+            "name": "Evening Ride",
+            "type": "Ride",
+            "distance": 20000,
+            "moving_time": 3600,
+            "total_elevation_gain": 100,
+        },
+    ]
+    mock_client_cls.return_value.__enter__.return_value.get.return_value = mock_resp
+
+    result = get_weekly_summary()
+
+    assert result["activity_count"] == 2
+    assert result["total_distance_km"] == 30.0
+    assert result["total_duration"] == "02:00:00"
+    assert result["total_elevation_m"] == 150.0
+    assert result["activity_types"] == {"Run": 1, "Ride": 1}
+    assert "week_starting" in result
+
+
+@patch("tools.strava._get_access_token", return_value="fake_token")
+@patch("tools.strava.httpx.Client")
+def test_get_weekly_summary_empty_week(mock_client_cls: MagicMock, _mock_token: MagicMock) -> None:
+    mock_resp = MagicMock()
+    mock_resp.json.return_value = []
+    mock_client_cls.return_value.__enter__.return_value.get.return_value = mock_resp
+
+    result = get_weekly_summary()
+
+    assert result["activity_count"] == 0
+    assert result["total_distance_km"] == 0.0
+    assert result["total_duration"] == "00:00:00"
+    assert result["activity_types"] == {}
