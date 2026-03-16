@@ -20,8 +20,8 @@ class EmailNotificationSender:
             raise ValueError("GMAIL_SENDER_EMAIL and GMAIL_APP_PASSWORD environment variables must be set")
 
     
-    async def send_email(self, recipient_email: str, subject: str, body: str) -> bool:
-        """Send email via Gmail SMTP"""
+    async def send_email(self, recipient_email: str, subject: str, body: str, html_body: str | None = None) -> bool:
+        """Send email via Gmail SMTP with optional HTML body"""
         try:
             # Create message
             message = MIMEMultipart("alternative")
@@ -29,9 +29,14 @@ class EmailNotificationSender:
             message["From"] = self.sender_email
             message["To"] = recipient_email
 
-            # Attach body
-            part = MIMEText(body, "plain")
-            message.attach(part)
+            # Attach plain text body
+            part_plain = MIMEText(body, "plain")
+            message.attach(part_plain)
+
+            # Attach HTML body if provided
+            if html_body:
+                part_html = MIMEText(html_body, "html")
+                message.attach(part_html)
 
             # Send email
             with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
