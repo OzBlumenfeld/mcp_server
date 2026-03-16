@@ -7,8 +7,14 @@ from datetime import datetime
 from html import unescape
 from typing import Any
 
+from dotenv import load_dotenv
+
 from email_sender import EmailNotificationSender
 from tools.daily_summary import get_daily_summary
+
+# Load environment variables from .env file
+if os.getenv("ENV", "local") == "local":
+    load_dotenv()
 
 
 MAX_SUBSCRIBERS = 5
@@ -85,9 +91,21 @@ def format_news_section_html(title: str, emoji: str, news_data: list[dict[str, A
             title_text = clean_html(article.get("title", "No title"))
             summary_text = clean_html(article.get("summary", ""))
             link = article.get("link", "")
+            image_url = article.get("image_url")
+
+            section += """
+            <div style="margin: 15px 0; padding: 12px; background-color: white; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            """
+
+            # Add image if available
+            if image_url:
+                section += f"""
+                <div style="margin-bottom: 12px;">
+                    <img src="{image_url}" alt="{title_text}" style="width: 100%; max-width: 600px; height: auto; border-radius: 6px; display: block;">
+                </div>
+                """
 
             section += f"""
-            <div style="margin: 15px 0; padding: 12px; background-color: white; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                 <div style="font-weight: bold; color: #2c3e50; margin-bottom: 8px; font-size: 16px;">
                     {idx}. {title_text}
                 </div>
@@ -324,9 +342,8 @@ async def send_newsletter() -> None:
 
     # Send to all subscribers
     success_count = 0
-    for subscriber in NEWSLETTER_SUBSCRIBERS:
-        print(f"   Sending to {subscriber}...")
-        success = await email_sender.send_email(subscriber, subject, newsletter_plain, html_body=newsletter_html)
+    results = await asyncio.gather(*[email_sender.send_email(subscriber, subject, newsletter_plain, html_body=newsletter_html) for subscriber in NEWSLETTER_SUBSCRIBERS])
+    for subscriber, success in zip(NEWSLETTER_SUBSCRIBERS, results):
         if success:
             print(f"   ✅ Sent to {subscriber}")
             success_count += 1

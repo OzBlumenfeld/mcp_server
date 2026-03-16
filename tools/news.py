@@ -1,5 +1,6 @@
 """News tools: Israeli news and tech TL;DR via RSS feeds."""
 
+import re
 from typing import Any
 
 import feedparser
@@ -55,18 +56,60 @@ def _truncate_at_sentence(text: str, max_length: int = 300) -> str:
     return truncated.strip() + '...'
 
 
+def _extract_image_url(entry: Any) -> str | None:
+    """Extract image URL from RSS feed entry."""
+    # Try media:content or media:thumbnail (common in RSS feeds)
+    if hasattr(entry, 'media_content') and entry.media_content:
+        return entry.media_content[0].get('url')
+
+    if hasattr(entry, 'media_thumbnail') and entry.media_thumbnail:
+        return entry.media_thumbnail[0].get('url')
+
+    # Try enclosure tag (podcasts and some news feeds)
+    if hasattr(entry, 'enclosures') and entry.enclosures:
+        for enclosure in entry.enclosures:
+            # Check if it's an image type
+            if enclosure.get('type', '').startswith('image/'):
+                return enclosure.get('href') or enclosure.get('url')
+
+    # Try links with image type
+    if hasattr(entry, 'links'):
+        for link in entry.links:
+            if link.get('type', '').startswith('image/'):
+                return link.get('href')
+
+    # Try to extract image from content/description HTML
+    content = entry.get('content', [{}])[0].get('value', '') if hasattr(entry, 'content') else ''
+    if not content:
+        content = entry.get('summary', '') or entry.get('description', '')
+
+    if content:
+        # Look for <img> tags in the content
+        img_match = re.search(r'<img[^>]+src=["\']([^"\']+)["\']', content)
+        if img_match:
+            return img_match.group(1)
+
+    return None
+
+
 def _parse_feed(url: str, limit: int) -> list[dict[str, str]]:
     feed = feedparser.parse(url)
     items = []
     for entry in feed.entries[:limit]:
         summary_text = entry.get("summary", entry.get("description", ""))
-        items.append(
-            {
-                "title": entry.get("title", "No title"),
-                "link": entry.get("link", ""),
-                "summary": _truncate_at_sentence(summary_text, 300),
-            }
-        )
+        image_url = _extract_image_url(entry)
+
+        article_data: dict[str, str] = {
+            "title": entry.get("title", "No title"),
+            "link": entry.get("link", ""),
+            "summary": _truncate_at_sentence(summary_text, 300),
+        }
+
+        # Only add image_url if it exists
+        if image_url:
+            article_data["image_url"] = image_url
+
+        items.append(article_data)
     return items
 
 
