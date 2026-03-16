@@ -306,7 +306,7 @@ async def send_newsletter() -> None:
         )
 
     print("📧 Fetching daily summary...")
-    summary_data = get_daily_summary(news_limit=3)
+    summary_data = get_daily_summary(news_limit=5)
 
     print("✍️  Formatting newsletter...")
     newsletter_html = create_newsletter_body_html(summary_data)
