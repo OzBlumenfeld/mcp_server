@@ -1,6 +1,7 @@
 """Daily newsletter script: fetch summary and email to subscribers."""
 
 import asyncio
+import os
 import re
 from datetime import datetime
 from html import unescape
@@ -9,8 +10,43 @@ from typing import Any
 from email_sender import EmailNotificationSender
 from tools.daily_summary import get_daily_summary
 
-# Newsletter subscriber list
-NEWSLETTER_SUBSCRIBERS = ["ozb077@gmail.com"]
+
+MAX_SUBSCRIBERS = 5
+
+
+def get_subscribers() -> list[str]:
+    """
+    Get newsletter subscribers from environment variable.
+
+    Expects NEWSLETTER_SUBSCRIBERS env var with comma-separated emails.
+    Example: "email1@example.com,email2@example.com,email3@example.com"
+
+    Returns:
+        List of subscriber email addresses
+    """
+    subscribers_env = os.getenv("NEWSLETTER_SUBSCRIBERS", "")
+
+    if not subscribers_env:
+        raise ValueError(
+            "NEWSLETTER_SUBSCRIBERS environment variable not set. "
+            "Please set it to a comma-separated list of email addresses."
+        )
+
+    # Split by comma and strip whitespace
+    subscribers = [email.strip() for email in subscribers_env.split(",")]
+
+    # Filter out empty strings
+    subscribers = [email for email in subscribers if email]
+
+    # Validate email format (basic check)
+    invalid_emails = [email for email in subscribers if "@" not in email or "." not in email]
+    if invalid_emails:
+        raise ValueError(f"Invalid email addresses found: {', '.join(invalid_emails)}")
+
+    return subscribers
+
+
+NEWSLETTER_SUBSCRIBERS = get_subscribers()
 
 
 def clean_html(text: str) -> str:
@@ -262,6 +298,13 @@ def create_newsletter_body_html(summary_data: dict[str, Any]) -> str:
 
 async def send_newsletter() -> None:
     """Fetch daily summary and send newsletter to all subscribers."""
+    # Safety check: Prevent sending to too many subscribers
+    if len(NEWSLETTER_SUBSCRIBERS) > MAX_SUBSCRIBERS:
+        raise ValueError(
+            f"Subscriber count ({len(NEWSLETTER_SUBSCRIBERS)}) exceeds maximum allowed ({MAX_SUBSCRIBERS}). "
+            f"Increase MAX_SUBSCRIBERS if this is intentional."
+        )
+
     print("📧 Fetching daily summary...")
     summary_data = get_daily_summary(news_limit=3)
 
