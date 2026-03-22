@@ -1,9 +1,11 @@
 """News tools: Israeli news and tech TL;DR via RSS feeds."""
 
 import re
+from datetime import date
 from typing import Any
 
 import feedparser
+import httpx
 
 NEWS = "news"
 TECH = "tech"
@@ -141,3 +143,27 @@ def get_world_news(limit_per_source: int = 3) -> list[dict[str, Any]]:
         items = _parse_feed(source["url"], limit_per_source)
         results.append({"source": source["name"], "articles": items})
     return results
+
+
+def get_hebrew_wikipedia_topic() -> dict[str, Any]:
+    """Fetch Hebrew Wikipedia's featured article of the day."""
+    today = date.today()
+    url = f"https://he.wikipedia.org/api/rest_v1/feed/featured/{today.year}/{today.month:02d}/{today.day:02d}"
+    try:
+        response = httpx.get(url, timeout=10, follow_redirects=True)
+        response.raise_for_status()
+        data = response.json()
+        tfa = data.get("tfa")
+        if not tfa:
+            return {"error": "No featured article found for today"}
+        result: dict[str, Any] = {
+            "title": tfa.get("titles", {}).get("display") or tfa.get("title", ""),
+            "extract": tfa.get("extract", ""),
+            "url": tfa.get("content_urls", {}).get("desktop", {}).get("page", ""),
+        }
+        image = tfa.get("originalimage") or tfa.get("thumbnail")
+        if image:
+            result["image_url"] = image.get("source", "")
+        return result
+    except Exception as e:
+        return {"error": str(e)}

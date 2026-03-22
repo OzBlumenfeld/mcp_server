@@ -3,7 +3,7 @@
 from typing import Any
 
 from tools.finance import get_weekly_performance
-from tools.news import get_israeli_news, get_tech_news, get_world_news
+from tools.news import get_hebrew_wikipedia_topic, get_israeli_news, get_tech_news, get_world_news
 
 
 def get_daily_summary(
@@ -14,13 +14,15 @@ def get_daily_summary(
     - Israeli news headlines
     - Tech news headlines
     - Stock/ETF prices with weekly performance
+    - Hebrew Wikipedia featured article of the day
 
     Args:
         news_limit: Number of articles per source (default: 3)
         etf_symbols: List of symbols to track (default: ETFs + major tech stocks)
 
     Returns:
-        Dictionary containing israeli_news, tech_news, and market_data with weekly performance
+        Dictionary containing israeli_news, tech_news, market_data with weekly performance,
+        and hebrew_wikipedia_topic
     """
 # Default: ETFs + Major Tech Stocks (NVIDIA, Google, Meta)
     symbols = etf_symbols if etf_symbols else ["BITO", "VOO", "QQQ", "TQQQ", "NVDA", "GOOGL", "META"]
@@ -29,6 +31,7 @@ def get_daily_summary(
     israeli_news = get_israeli_news(limit_per_source=news_limit)
     tech_news = get_tech_news(limit_per_source=news_limit)
     world_news = get_world_news(limit_per_source=news_limit)
+    hebrew_wikipedia_topic = get_hebrew_wikipedia_topic()
 
     # Fetch weekly performance data for each symbol
     market_data = []
@@ -44,4 +47,5 @@ def get_daily_summary(
         "tech_news": tech_news,
         "world_news": world_news,
         "market_data": market_data,
+        "hebrew_wikipedia_topic": hebrew_wikipedia_topic,
     }

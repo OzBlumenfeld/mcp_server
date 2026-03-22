@@ -9,7 +9,7 @@ from email_sender import EmailNotificationSender
 from logging_config import setup_logging
 from tools.daily_summary import get_daily_summary
 from tools.finance import get_etf_price, get_market_snapshot
-from tools.news import get_israeli_news, get_tech_news
+from tools.news import get_hebrew_wikipedia_topic, get_israeli_news, get_tech_news
 from tools.strava import get_recent_activities, get_weekly_summary
 
 # Load environment variables from .env file
@@ -95,6 +95,7 @@ async def fetch_news(query: str | None = None, category: str | None = None) -> s
 
 mcp.tool(get_israeli_news)
 mcp.tool(get_tech_news)
+mcp.tool(get_hebrew_wikipedia_topic)
 
 # ── Daily Summary ─────────────────────────────────────────────────────────────
 
