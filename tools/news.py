@@ -1,6 +1,7 @@
 """News tools: Israeli news and tech TL;DR via RSS feeds."""
 
 import re
+from html import unescape
 from typing import Any
 
 import feedparser
@@ -92,17 +93,29 @@ def _extract_image_url(entry: Any) -> str | None:
     return None
 
 
+def _clean_summary(raw_html: str) -> str:
+    """Clean HTML from summary and discard if it's just a navigation link (e.g. HN 'Comments')."""
+    text = re.sub(r'<[^>]+/?>', '', raw_html)
+    text = unescape(text)
+    text = re.sub(r'\s+', ' ', text).strip()
+    # Discard summaries that are just noise (e.g. Hacker News "Comments" link)
+    if text.lower() in {"comments", ""}:
+        return ""
+    return text
+
+
 def _parse_feed(url: str, limit: int) -> list[dict[str, str]]:
     feed = feedparser.parse(url)
     items = []
     for entry in feed.entries[:limit]:
-        summary_text = entry.get("summary", entry.get("description", ""))
+        raw_summary = entry.get("summary", entry.get("description", ""))
+        summary_text = _clean_summary(raw_summary)
         image_url = _extract_image_url(entry)
 
         article_data: dict[str, str] = {
             "title": entry.get("title", "No title"),
             "link": entry.get("link", ""),
-            "summary": _truncate_at_sentence(summary_text, 300),
+            "summary": _truncate_at_sentence(summary_text, 300) if summary_text else "",
         }
 
         # Only add image_url if it exists
