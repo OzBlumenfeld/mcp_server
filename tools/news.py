@@ -150,7 +150,7 @@ def get_hebrew_wikipedia_topic() -> dict[str, Any]:
     today = date.today()
     url = f"https://he.wikipedia.org/api/rest_v1/feed/featured/{today.year}/{today.month:02d}/{today.day:02d}"
     try:
-        response = httpx.get(url, timeout=10, follow_redirects=True)
+        response = httpx.get(url, timeout=10, follow_redirects=True, headers={"User-Agent": "MyAssistant/1.0 (https://github.com/OzBlumenfeld/mcp_server)"})
         response.raise_for_status()
         data = response.json()
         tfa = data.get("tfa")
