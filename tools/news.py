@@ -1,6 +1,7 @@
 """News tools: Israeli news and tech TL;DR via RSS feeds."""
 
 import re
+from datetime import datetime, timezone
 from html import unescape
 from typing import Any
 
@@ -21,7 +22,8 @@ FEEDS: dict[str, list[dict[str, str]]] = {
         {"name": "The Verge", "url": "https://www.theverge.com/rss/index.xml"},
     ],
     WORLD: [
-        {"name": "CNN", "url": "http://rss.cnn.com/rss/cnn_topstories.rss"},
+        {"name": "NPR", "url": "https://feeds.npr.org/1001/rss.xml"},
+        {"name": "BBC News", "url": "https://feeds.bbci.co.uk/news/world/rss.xml"},
     ],
 }
 
@@ -104,10 +106,25 @@ def _clean_summary(raw_html: str) -> str:
     return text
 
 
+_MAX_AGE_DAYS = 7
+
+
+def _is_recent(entry: Any) -> bool:
+    """Return True if the entry was published within the last _MAX_AGE_DAYS days."""
+    published = entry.get("published_parsed") or entry.get("updated_parsed")
+    if published is None:
+        return True  # No date info — don't filter out
+    published_dt = datetime(*published[:6], tzinfo=timezone.utc)
+    age = datetime.now(timezone.utc) - published_dt
+    return age.days <= _MAX_AGE_DAYS
+
+
 def _parse_feed(url: str, limit: int) -> list[dict[str, str]]:
     feed = feedparser.parse(url)
     items = []
-    for entry in feed.entries[:limit]:
+    for entry in feed.entries:
+        if not _is_recent(entry):
+            continue
         raw_summary = entry.get("summary", entry.get("description", ""))
         summary_text = _clean_summary(raw_summary)
         image_url = _extract_image_url(entry)
@@ -123,6 +140,8 @@ def _parse_feed(url: str, limit: int) -> list[dict[str, str]]:
             article_data["image_url"] = image_url
 
         items.append(article_data)
+        if len(items) >= limit:
+            break
     return items
 
 

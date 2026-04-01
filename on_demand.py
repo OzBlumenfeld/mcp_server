@@ -15,7 +15,7 @@ from tools.daily_summary import get_daily_summary
 # Load environment variables from .env file
 if os.getenv("ENV", "local") == "local":
     load_dotenv()
-
+    
 
 MAX_SUBSCRIBERS = 5
 
