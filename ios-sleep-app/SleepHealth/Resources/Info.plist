@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- HealthKit usage descriptions (required for App Store review) -->
+    <key>NSHealthShareUsageDescription</key>
+    <string>Sleep Health reads your sleep analysis data from Apple Health to display your nightly sleep patterns and trends.</string>
+
+    <key>NSHealthUpdateUsageDescription</key>
+    <string>Sleep Health does not write any data to Apple Health.</string>
+
+    <!-- Required capabilities -->
+    <key>UIRequiredDeviceCapabilities</key>
+    <array>
+        <string>healthkit</string>
+    </array>
+
+    <key>UILaunchScreen</key>
+    <dict/>
+
+    <key>UISupportedInterfaceOrientations</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+    </array>
+</dict>
+</plist>
