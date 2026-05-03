@@ -324,7 +324,8 @@ async def send_newsletter() -> None:
         )
 
     print("📧 Fetching daily summary...")
-    summary_data = get_daily_summary(news_limit=5)
+    news_limit = int(os.getenv("NEWS_LIMIT", 3))
+    summary_data = get_daily_summary(news_limit=news_limit)
 
     print("✍️  Formatting newsletter...")
     newsletter_html = create_newsletter_body_html(summary_data)
