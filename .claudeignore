@@ -1,0 +1,26 @@
+# Secrets
+.env
+*.env
+.env.*
+
+# Virtual environments & build artifacts
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Lock files (large, rarely useful for AI context)
+uv.lock
+
+# Caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Coverage
+.coverage
+htmlcov/
+coverage.xml

@@ -3,7 +3,7 @@
 from typing import Any
 
 from tools.finance import get_weekly_performance
-from tools.news import get_israeli_news, get_tech_news, get_world_news
+from tools.news.news import get_israeli_news, get_tech_news, get_world_news
 
 
 def get_daily_summary(

@@ -3,18 +3,22 @@
 import asyncio
 import os
 import re
+import sys
 from datetime import datetime
 from html import unescape
+from pathlib import Path
 from typing import Any
+
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from dotenv import load_dotenv
 
-from email_sender import EmailNotificationSender
-from tools.daily_summary import get_daily_summary
-
 # Load environment variables from .env file
 if os.getenv("ENV", "local") == "local":
-    load_dotenv()
+    load_dotenv(Path(__file__).parent.parent.parent / ".env")
+
+from email_sender import EmailNotificationSender
+from tools.daily_summary import get_daily_summary
     
 
 MAX_SUBSCRIBERS = 5

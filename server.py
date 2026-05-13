@@ -1,5 +1,6 @@
 import logging
 import os
+from pathlib import Path
 
 import httpx
 from dotenv import load_dotenv
@@ -9,11 +10,12 @@ from email_sender import EmailNotificationSender
 from logging_config import setup_logging
 from tools.daily_summary import get_daily_summary
 from tools.finance import get_etf_price, get_market_snapshot
-from tools.news import get_israeli_news, get_tech_news
+from tools.news.news import get_israeli_news, get_tech_news
+from tools.spotify.spotify import get_top_podcasts, get_top_tracks
 from tools.strava import get_recent_activities, get_weekly_summary
 
 # Load environment variables from .env file
-load_dotenv()
+load_dotenv(Path(__file__).parent / ".env")
 
 # Call setup_logging at the top level
 setup_logging()
@@ -25,7 +27,8 @@ mcp = FastMCP(
     name="MyAssistantServer",
     instructions=(
         "This server provides tools for email notifications, "
-        "news (NewsAPI + RSS), finance (Yahoo Finance), and Strava fitness data."
+        "news (NewsAPI + RSS), finance (Yahoo Finance), Strava fitness data, "
+        "and Spotify music/podcast data."
     ),
 )
 
@@ -109,6 +112,11 @@ mcp.tool(get_market_snapshot)
 
 mcp.tool(get_recent_activities)
 mcp.tool(get_weekly_summary)
+
+# ── Spotify ───────────────────────────────────────────────────────────────────
+
+mcp.tool(get_top_tracks)
+mcp.tool(get_top_podcasts)
 
 
 if __name__ == "__main__":
