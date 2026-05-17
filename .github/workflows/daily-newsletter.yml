@@ -35,4 +35,4 @@ jobs:
           NEWSLETTER_SUBSCRIBERS: ${{ secrets.NEWSLETTER_SUBSCRIBERS }}
           NEWS_LIMIT: ${{ env.NEWS_LIMIT}}
           
-        run: uv run python on_demand.py
+        run: uv run python tools/news/on_demand.py
