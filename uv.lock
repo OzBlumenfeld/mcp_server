@@ -537,6 +537,7 @@ dependencies = [
     { name = "fastmcp" },
     { name = "feedparser" },
     { name = "httpx" },
+    { name = "oz-shared" },
     { name = "python-dotenv" },
 ]
 
@@ -551,6 +552,7 @@ requires-dist = [
     { name = "fastmcp", specifier = "==3.1.0" },
     { name = "feedparser", specifier = ">=6.0.12" },
     { name = "httpx", specifier = ">=0.28.1" },
+    { name = "oz-shared", git = "https://github.com/ozblumenfeld/oz-shared?rev=main" },
     { name = "python-dotenv", specifier = ">=1.2.1" },
 ]
 
@@ -601,6 +603,14 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/2c/1d/4049a9e8698361cc1a1aa03a6c59e4fa4c71e0c0f94a30f988a6876a2ae6/opentelemetry_api-1.40.0.tar.gz", hash = "sha256:159be641c0b04d11e9ecd576906462773eb97ae1b657730f0ecf64d32071569f", size = 70851, upload-time = "2026-03-04T14:17:21.555Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/5f/bf/93795954016c522008da367da292adceed71cca6ee1717e1d64c83089099/opentelemetry_api-1.40.0-py3-none-any.whl", hash = "sha256:82dd69331ae74b06f6a874704be0cfaa49a1650e1537d4a813b86ecef7d0ecf9", size = 68676, upload-time = "2026-03-04T14:17:01.24Z" },
+]
+
+[[package]]
+name = "oz-shared"
+version = "0.1.0"
+source = { git = "https://github.com/ozblumenfeld/oz-shared?rev=main#07dd48ff2d7384902015391ff000d9a961998bcc" }
+dependencies = [
+    { name = "pydantic" },
 ]
 
 [[package]]

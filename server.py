@@ -4,21 +4,23 @@ from pathlib import Path
 
 import httpx
 from dotenv import load_dotenv
-from fastmcp import FastMCP
-
 from email_sender import EmailNotificationSender
+from fastmcp import FastMCP
 from logging_config import setup_logging
+from tools.calendar.calendar import fetch_calendar_events
 from tools.daily_summary import get_daily_summary
 from tools.finance import get_etf_price, get_market_snapshot
 from tools.news.news import get_israeli_news, get_tech_news
 from tools.spotify.spotify import get_top_podcasts, get_top_tracks
 from tools.strava import get_recent_activities, get_weekly_summary
+from oz_shared import OptStr, load_op_secrets
 
 # Load environment variables from .env file
 load_dotenv(Path(__file__).parent / ".env")
 
 # Call setup_logging at the top level
 setup_logging()
+load_op_secrets()
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +56,7 @@ async def send_email(recipient_email: str, subject: str, body: str) -> str:
 # ── News (NewsAPI) ────────────────────────────────────────────────────────────
 
 @mcp.tool
-async def fetch_news(query: str | None = None, category: str | None = None) -> str:
+async def fetch_news(query: OptStr = None, category: OptStr = None) -> str:
     """
     Fetch top 20 news headlines from NewsAPI.
     Categories: business, entertainment, general, health, science, sports, technology.
@@ -117,6 +119,10 @@ mcp.tool(get_weekly_summary)
 
 mcp.tool(get_top_tracks)
 mcp.tool(get_top_podcasts)
+
+# ── Google Calendar ───────────────────────────────────────────────────────────
+
+mcp.tool(fetch_calendar_events)
 
 
 if __name__ == "__main__":
