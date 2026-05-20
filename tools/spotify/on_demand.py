@@ -1,13 +1,15 @@
 from pathlib import Path
 
 from dotenv import load_dotenv
+from oz_shared import load_op_secrets
+from tools.spotify.spotify import get_top_tracks
 
 load_dotenv(Path(__file__).parent.parent.parent / ".env")
+load_op_secrets()
 
-from spotify import get_top_tracks
 
-# todo: Extend here to the news papaer for example weekly job + check with mcp server
+# todo: Extend here to the news paper for example weekly job + check with mcp server
 
 print(get_top_tracks())
 
-# print(get_top_podcasts()) # this one doesn't work at the moment podcasts are no longer suppoprted by spotify
+# print(get_top_podcasts()) # this one doesn't work at the moment podcasts are no longer supported by spotify
