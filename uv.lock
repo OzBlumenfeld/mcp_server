@@ -608,7 +608,7 @@ wheels = [
 [[package]]
 name = "oz-shared"
 version = "0.1.0"
-source = { git = "https://github.com/ozblumenfeld/oz-shared?rev=main#07dd48ff2d7384902015391ff000d9a961998bcc" }
+source = { git = "https://github.com/ozblumenfeld/oz-shared?rev=main#86cea90dab021b9631577fe778981b9329d9553f" }
 dependencies = [
     { name = "pydantic" },
 ]

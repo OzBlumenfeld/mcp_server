@@ -13,7 +13,8 @@ from tools.finance import get_etf_price, get_market_snapshot
 from tools.news.news import get_israeli_news, get_tech_news
 from tools.spotify.spotify import get_top_podcasts, get_top_tracks
 from tools.strava import get_recent_activities, get_weekly_summary
-from oz_shared import OptStr, load_op_secrets
+from oz_shared.onepassword import load_op_secrets
+from oz_shared.types import OptStr
 
 # Load environment variables from .env file
 load_dotenv(Path(__file__).parent / ".env")

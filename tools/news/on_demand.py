@@ -8,7 +8,7 @@ from datetime import datetime
 from html import unescape
 from pathlib import Path
 from typing import Any
-from oz_shared import load_op_secrets
+from oz_shared.onepassword import load_op_secrets
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 

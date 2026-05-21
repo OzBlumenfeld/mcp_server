@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from dotenv import load_dotenv
-from oz_shared import load_op_secrets
+from oz_shared.onepassword import load_op_secrets
 from tools.spotify.spotify import get_top_tracks
 
 load_dotenv(Path(__file__).parent.parent.parent / ".env")
