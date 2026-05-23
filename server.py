@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import os
 from pathlib import Path
@@ -21,7 +22,7 @@ load_dotenv(Path(__file__).parent / ".env")
 
 # Call setup_logging at the top level
 setup_logging()
-load_op_secrets()
+asyncio.run(load_op_secrets())
 
 logger = logging.getLogger(__name__)
 
@@ -57,10 +58,15 @@ async def send_email(recipient_email: str, subject: str, body: str) -> str:
 # ── News (NewsAPI) ────────────────────────────────────────────────────────────
 
 @mcp.tool
-async def fetch_news(query: OptStr = None, category: OptStr = None) -> str:
+async def fetch_news(
+    query: OptStr = None,
+    category: OptStr = None,
+    news_limit: int = 10,
+) -> str:
     """
-    Fetch top 20 news headlines from NewsAPI.
+    Fetch top news headlines from NewsAPI.
     Categories: business, entertainment, general, health, science, sports, technology.
+    Use news_limit to control how many headlines are returned (default 10, max 20).
     """
     api_key = os.getenv("NEWS_API_KEY")
     if not api_key or api_key == "your_news_api_key_here":
@@ -69,7 +75,7 @@ async def fetch_news(query: OptStr = None, category: OptStr = None) -> str:
     base_url = "https://newsapi.org/v2/top-headlines"
     params: dict[str, str | int] = {
         "apiKey": api_key,
-        "pageSize": 20,
+        "pageSize": min(news_limit, 20),
         "language": "en",
     }
     if query:

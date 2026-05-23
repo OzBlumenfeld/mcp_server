@@ -360,5 +360,5 @@ async def send_newsletter() -> None:
 
 
 if __name__ == "__main__":
-    load_op_secrets()
+    asyncio.run(load_op_secrets())
     asyncio.run(send_newsletter())
