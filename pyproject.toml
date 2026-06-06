@@ -9,7 +9,11 @@ dependencies = [
   "feedparser>=6.0.12",
   "httpx>=0.28.1",
   "python-dotenv>=1.2.1",
+  "oz-shared[postgres]",
 ]
+
+[tool.uv.sources]
+oz-shared = { git = "https://github.com/ozblumenfeld/oz-shared", rev = "main" }
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

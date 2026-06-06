@@ -1,24 +1,28 @@
+import asyncio
 import logging
 import os
 from pathlib import Path
 
 import httpx
 from dotenv import load_dotenv
-from fastmcp import FastMCP
-
 from email_sender import EmailNotificationSender
+from fastmcp import FastMCP
 from logging_config import setup_logging
+from tools.calendar.gcal import fetch_calendar_events
 from tools.daily_summary import get_daily_summary
 from tools.finance import get_etf_price, get_market_snapshot
 from tools.news.news import get_israeli_news, get_tech_news
 from tools.spotify.spotify import get_top_podcasts, get_top_tracks
 from tools.strava import get_recent_activities, get_weekly_summary
+from oz_shared.onepassword import load_op_secrets
+from oz_shared.types import OptStr
 
 # Load environment variables from .env file
 load_dotenv(Path(__file__).parent / ".env")
 
 # Call setup_logging at the top level
 setup_logging()
+asyncio.run(load_op_secrets())
 
 logger = logging.getLogger(__name__)
 
@@ -54,10 +58,15 @@ async def send_email(recipient_email: str, subject: str, body: str) -> str:
 # ── News (NewsAPI) ────────────────────────────────────────────────────────────
 
 @mcp.tool
-async def fetch_news(query: str | None = None, category: str | None = None) -> str:
+async def fetch_news(
+    query: OptStr = None,
+    category: OptStr = None,
+    news_limit: int = 10,
+) -> str:
     """
-    Fetch top 20 news headlines from NewsAPI.
+    Fetch top news headlines from NewsAPI.
     Categories: business, entertainment, general, health, science, sports, technology.
+    Use news_limit to control how many headlines are returned (default 10, max 20).
     """
     api_key = os.getenv("NEWS_API_KEY")
     if not api_key or api_key == "your_news_api_key_here":
@@ -66,7 +75,7 @@ async def fetch_news(query: str | None = None, category: str | None = None) -> s
     base_url = "https://newsapi.org/v2/top-headlines"
     params: dict[str, str | int] = {
         "apiKey": api_key,
-        "pageSize": 20,
+        "pageSize": min(news_limit, 20),
         "language": "en",
     }
     if query:
@@ -117,6 +126,10 @@ mcp.tool(get_weekly_summary)
 
 mcp.tool(get_top_tracks)
 mcp.tool(get_top_podcasts)
+
+# ── Google Calendar ───────────────────────────────────────────────────────────
+
+mcp.tool(fetch_calendar_events)
 
 
 if __name__ == "__main__":

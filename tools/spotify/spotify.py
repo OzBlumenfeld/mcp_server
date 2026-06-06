@@ -15,6 +15,7 @@ def _get_access_token() -> str:
     client_id = os.getenv("SPOTIFY_CLIENT_ID")
     client_secret = os.getenv("SPOTIFY_CLIENT_SECRET")
     refresh_token = os.getenv("SPOTIFY_REFRESH_TOKEN")
+    print(client_id)
 
     if not all([client_id, client_secret, refresh_token]):
         raise ValueError(
