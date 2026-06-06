@@ -15,7 +15,7 @@ if os.getenv("ENV", "local") == "local":
     load_dotenv(Path(__file__).parent.parent.parent / ".env")
 
 from email_sender import EmailNotificationSender
-from tools.calendar.calendar import fetch_calendar_events
+from tools.calendar.gcal import fetch_calendar_events
 
 
 def get_recipient() -> str:

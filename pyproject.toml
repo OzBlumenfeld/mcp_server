@@ -9,7 +9,7 @@ dependencies = [
   "feedparser>=6.0.12",
   "httpx>=0.28.1",
   "python-dotenv>=1.2.1",
-  "oz-shared",
+  "oz-shared[postgres]",
 ]
 
 [tool.uv.sources]

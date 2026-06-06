@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from email_sender import EmailNotificationSender
 from fastmcp import FastMCP
 from logging_config import setup_logging
-from tools.calendar.calendar import fetch_calendar_events
+from tools.calendar.gcal import fetch_calendar_events
 from tools.daily_summary import get_daily_summary
 from tools.finance import get_etf_price, get_market_snapshot
 from tools.news.news import get_israeli_news, get_tech_news
