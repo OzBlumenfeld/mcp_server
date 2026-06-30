@@ -7,6 +7,8 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
+from oz_shared import load_op_secrets
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from dotenv import load_dotenv
@@ -162,4 +164,5 @@ async def send_weekly_calendar_email() -> None:
 
 
 if __name__ == "__main__":
+    asyncio.run(load_op_secrets())
     asyncio.run(send_weekly_calendar_email())
