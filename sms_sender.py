@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import os
 
@@ -57,13 +58,25 @@ class SMSNotificationSender:
                 },
             )
             return True
-        except Exception as e:
-            logger.error(
+        except Exception:
+            logger.exception(
                 "Failed to send SMS",
                 extra={
                     "recipient": recipient_phone,
-                    "error": str(e),
                     "length": len(message),
                 },
             )
             return False
+
+
+async def main() -> None:
+    sender = SMSNotificationSender()
+    recepient_phone = os.getenv("RECEPIENT_PHONE_NUMBER")
+    await sender.send_sms(recipient_phone=recepient_phone, message="sms_event_notifications")
+
+
+if __name__ == "__main__":
+    # Run main function with default arguments
+    from oz_shared import load_op_secrets
+    asyncio.run(load_op_secrets())
+    asyncio.run(main())
