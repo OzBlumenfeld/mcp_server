@@ -2,6 +2,7 @@
 
 import asyncio
 import os
+import logging
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -11,6 +12,7 @@ from oz_shared import load_op_secrets
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
+from logging_config import setup_logging
 from dotenv import load_dotenv
 
 if os.getenv("ENV", "local") == "local":
@@ -18,6 +20,9 @@ if os.getenv("ENV", "local") == "local":
 
 from email_sender import EmailNotificationSender
 from tools.calendar.gcal import fetch_calendar_events
+
+setup_logging()
+logger = logging.getLogger(__name__)
 
 
 def get_recipient() -> str:
@@ -139,13 +144,13 @@ async def send_weekly_calendar_email() -> None:
     start_date = now.strftime("%Y-%m-%d")
     end_date = (now + timedelta(days=7)).strftime("%Y-%m-%d")
 
-    print(f"📅 Fetching calendar events from {start_date} to {end_date}...")
+    logger.info(f"📅 Fetching calendar events from {start_date} to {end_date}...")
     calendar_data = fetch_calendar_events(start_date=start_date, end_date=end_date)
 
     total = sum(len(d["events"]) for d in calendar_data["days"])
-    print(f"   Found {total} events")
+    logger.info(f"   Found {total} events")
 
-    print("✍️  Formatting email...")
+    logger.info("✍️  Formatting email...")
     html_body = create_calendar_email_html(calendar_data)
     plain_body = (
         f"Weekly Calendar Summary\n"
@@ -156,11 +161,11 @@ async def send_weekly_calendar_email() -> None:
     subject = f"📅 Weekly Calendar — {calendar_data['range_start']}"
 
     email_sender = EmailNotificationSender()
-    print(f"📨 Sending to {recipient}...")
+    logger.info(f"📨 Sending to {recipient}...")
 
     success = await email_sender.send_email(recipient, subject, plain_body, html_body=html_body)
-    print(f"   {'✅' if success else '❌'} {recipient}")
-    print(f"\n✨ {'Sent successfully' if success else 'Failed to send'}")
+    logger.info(f"   {'✅' if success else '❌'} {recipient}")
+    logger.info(f"\n✨ {'Sent successfully' if success else 'Failed to send'}")
 
 
 if __name__ == "__main__":

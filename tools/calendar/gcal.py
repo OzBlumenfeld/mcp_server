@@ -33,7 +33,11 @@ def _get_access_token() -> str:
                 "grant_type": "refresh_token",
             },
         )
-        resp.raise_for_status()
+        if resp.status_code != 200:
+            error_body = resp.text
+            raise ValueError(
+                f"Google OAuth token refresh failed with {resp.status_code}: {error_body}"
+            )
     return str(resp.json()["access_token"])
 
 
