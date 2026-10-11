@@ -1,9 +1,9 @@
 name: Weekly Calendar Summary
 
 on:
-  schedule:
-    # Every Saturday at 21:00 UTC
-    - cron: "0 21 * * 6"
+  # schedule:
+  #   # Every Saturday at 21:00 UTC
+  #   - cron: "0 21 * * 6"
   workflow_dispatch: # Allow manual trigger from GitHub UI
 
 jobs:
